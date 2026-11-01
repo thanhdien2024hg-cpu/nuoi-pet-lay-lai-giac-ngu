@@ -1,0 +1,165 @@
+from pathlib import Path
+
+html = r'''<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>REM — Nuôi Pet, lấy lại giấc ngủ</title>
+<style>
+:root{
+ --site-primary:#6C5CE7; --site-secondary:#FFB86B; --site-background:#F7F5FF;
+ --site-on-primary:#FFFFFF; --site-on-secondary:#2C203A; --site-on-background:#242238;
+ --site-font-body:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+ --site-font-heading:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+ --site-heading-scale:1; --site-spacing-scale:1; --site-radius-scale:1; --site-decoration-opacity:1;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--site-font-body);color:var(--site-on-background);background:var(--site-background)}
+#app{min-height:100vh;background-color:var(--site-background);overflow:hidden}
+button{font:inherit;cursor:pointer}
+.nav{height:72px;display:flex;align-items:center;justify-content:space-between;padding:0 5vw;border-bottom:1px solid #E8E4F4;background:#FFFFFFE8;backdrop-filter:blur(14px);position:sticky;top:0;z-index:10}
+.logo{display:flex;align-items:center;gap:10px;font-weight:900;letter-spacing:-.03em}.logo-mark{width:38px;height:38px;border-radius:14px;background:var(--site-primary);display:grid;place-items:center;color:#fff;font-size:20px}
+.navlinks{display:flex;gap:8px}.navlinks button{border:0;background:transparent;padding:10px 13px;border-radius:12px;color:#6B6780;font-weight:700}.navlinks button.active,.navlinks button:hover{background:#EEEAFE;color:var(--site-primary)}
+.profile{display:flex;align-items:center;gap:10px}.avatar{width:38px;height:38px;border-radius:50%;background:#FFD9B2;display:grid;place-items:center}
+main{max-width:1180px;margin:auto;padding:48px 5vw 70px}
+.view{display:none}.view.active{display:block}
+.hero{display:grid;grid-template-columns:1.05fr .95fr;gap:55px;align-items:center;min-height:610px}
+.eyebrow{display:inline-flex;gap:8px;align-items:center;background:#EDE9FF;color:var(--site-primary);padding:8px 12px;border-radius:999px;font-weight:800;font-size:13px}
+h1{font-size:clamp(44px,6vw,76px);line-height:.98;letter-spacing:-.055em;margin:18px 0 20px}
+h2{font-size:calc(34px * var(--site-heading-scale));letter-spacing:-.04em;margin:0 0 10px}
+h3{margin:0 0 7px}.lead{font-size:19px;line-height:1.65;color:#676278;max-width:620px}
+.cta{display:flex;gap:12px;margin-top:28px;flex-wrap:wrap}
+.btn{border:0;border-radius:16px;padding:14px 19px;font-weight:850}.primary{background:var(--site-primary);color:white;box-shadow:0 12px 30px #6C5CE733}.secondary{background:white;color:#514B63;border:1px solid #E6E0F2}
+.pet-scene{height:500px;border-radius:36px;background:linear-gradient(145deg,#EAE5FF,#FFF5E9);position:relative;overflow:hidden;box-shadow:0 30px 70px #53488B18;border:1px solid #E5DEF5}
+.cloud{position:absolute;width:190px;height:70px;background:#fff8;border-radius:50%;top:50px;left:35px}.cloud:after{content:"";position:absolute;width:110px;height:80px;background:#fff8;border-radius:50%;left:70px;top:-28px}
+.room{position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:center}.bed{width:72%;height:150px;background:#DCCEFF;border-radius:30px 30px 0 0;position:relative}.pillow{position:absolute;left:10%;top:22px;width:28%;height:48px;border-radius:18px;background:#FFF}.blanket{position:absolute;right:7%;top:12px;width:55%;height:115px;border-radius:26px;background:#A99AEF}
+.pet{position:absolute;left:50%;transform:translateX(-50%);bottom:105px;width:155px;height:155px;border-radius:48% 48% 44% 44%;background:#FFB66B;border:7px solid #D98742;box-shadow:inset 0 -14px #F49B4F;animation:float 3s ease-in-out infinite}.ear{position:absolute;width:55px;height:70px;background:#FFB66B;border:7px solid #D98742;top:-28px;border-radius:60% 60% 30% 30%;z-index:-1}.ear.l{left:2px;transform:rotate(-25deg)}.ear.r{right:2px;transform:rotate(25deg)}.eye{position:absolute;top:55px;width:13px;height:18px;border-radius:50%;background:#34273D}.eye.l{left:42px}.eye.r{right:42px}.mouth{position:absolute;left:50%;top:83px;width:22px;height:12px;border-bottom:4px solid #34273D;border-radius:50%}.blush{position:absolute;top:78px;width:23px;height:10px;border-radius:50%;background:#FF8F88}.blush.l{left:20px}.blush.r{right:20px}
+.sleep-bubble{position:absolute;right:24px;top:24px;background:#fff;padding:13px 16px;border-radius:18px;box-shadow:0 10px 30px #51476D18;font-weight:800}.stars{position:absolute;right:45px;bottom:245px;font-size:24px}
+.section-head{display:flex;justify-content:space-between;align-items:end;margin-bottom:24px}.muted{color:#777187}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.card{background:white;border:1px solid #E8E3F2;border-radius:24px;padding:22px;box-shadow:0 12px 30px #4B426B0B}.stat{font-size:32px;font-weight:900}.pill{display:inline-block;padding:6px 10px;border-radius:999px;background:#F0EDFF;color:var(--site-primary);font-size:12px;font-weight:850}
+.house{display:grid;grid-template-columns:1.2fr .8fr;gap:22px}.panel{background:white;border:1px solid #E7E1F0;border-radius:28px;padding:24px}.checkin{display:flex;align-items:center;justify-content:space-between;gap:20px}.big-time{font-size:56px;font-weight:900;letter-spacing:-.05em}.status{padding:12px 14px;border-radius:15px;background:#FFF3E5;color:#A85C14;font-weight:800}
+.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;margin-top:15px}.day{padding:12px 6px;text-align:center;border-radius:12px;background:#F4F1FA;font-size:13px}.day.good{background:#DDF7E7;color:#187A46;font-weight:800}.day.today{outline:2px solid var(--site-primary)}
+.challenge-row{display:flex;justify-content:space-between;align-items:center;padding:15px 0;border-bottom:1px solid #eee}.bar{height:10px;background:#EEEAF5;border-radius:99px;overflow:hidden;margin-top:10px}.bar span{display:block;height:100%;background:var(--site-primary);width:68%}
+.flip-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}.flip{height:230px;perspective:800px}.flip-inner{height:100%;transition:.55s;transform-style:preserve-3d;position:relative}.flip:hover .flip-inner,.flip.open .flip-inner{transform:rotateY(180deg)}.face{position:absolute;inset:0;backface-visibility:hidden;border-radius:24px;padding:20px;background:white;border:1px solid #E8E2F1;box-shadow:0 12px 25px #4B426B0A}.back{transform:rotateY(180deg);background:#F1EEFF}.icon{font-size:35px;margin-bottom:25px}
+.community{display:grid;grid-template-columns:1fr .8fr;gap:22px}.post{display:flex;gap:14px;padding:17px 0;border-bottom:1px solid #EEEAF2}.post-avatar{width:42px;height:42px;border-radius:50%;background:#FFD9B2;display:grid;place-items:center;flex:none}.like{border:0;background:#FFF0F2;color:#D85872;border-radius:12px;padding:7px 10px}
+.modal{position:fixed;inset:0;background:#17132999;display:none;align-items:center;justify-content:center;z-index:30;padding:20px}.modal.show{display:flex}.modal-box{max-width:560px;width:100%;background:white;border-radius:28px;padding:28px}.close{float:right;border:0;background:#F2EFF8;border-radius:50%;width:34px;height:34px}
+@keyframes float{50%{transform:translate(-50%,-10px)}}
+@media(max-width:800px){.navlinks{display:none}.hero,.house,.community{grid-template-columns:1fr}.hero{min-height:auto;padding-top:25px}.pet-scene{height:390px}.cards{grid-template-columns:1fr}.flip-grid{grid-template-columns:repeat(2,1fr)}main{padding-top:30px}.section-head{align-items:start;gap:15px;flex-direction:column}}
+</style>
+</head>
+<body>
+<div id="app">
+<header class="nav">
+  <div class="logo"><div class="logo-mark">☾</div><span>REM PET</span></div>
+  <nav class="navlinks">
+    <button class="active" data-view="home">Trang chủ</button><button data-view="house">Nhà Pet</button><button data-view="challenge">21 ngày</button><button data-view="treasure">Kho báu</button><button data-view="community">Cộng đồng</button>
+  </nav>
+  <div class="profile"><span class="pill">Ngày 4/21</span><div class="avatar">🐣</div></div>
+</header>
+
+<main>
+<section id="home" class="view active">
+  <div class="hero">
+    <div>
+      <span class="eyebrow">🌙 DỰ ÁN 21 NGÀY • ANTI-DOOMSCROLLING</span>
+      <h1>Nuôi Pet.<br><span style="color:var(--site-primary)">Lấy lại giấc ngủ.</span></h1>
+      <p class="lead">Mỗi tối bạn chọn một giờ đi ngủ. Pet sẽ lớn lên cùng bạn. Ngủ sớm, Pet khỏe. Thức khuya, Pet mệt. Sau 21 ngày, bạn và Pet cùng tiến hóa.</p>
+      <div class="cta"><button class="btn primary" onclick="startTest()">Bắt đầu nuôi Pet →</button><button class="btn secondary" onclick="go('treasure')">Xem 5 bí kíp</button></div>
+      <p class="muted" style="margin-top:18px;font-size:13px">Không phán xét • Không so sánh cơ thể • Chỉ tập trung vào thói quen ngủ</p>
+    </div>
+    <div class="pet-scene">
+      <div class="cloud"></div><div class="sleep-bubble">✨ Pet đang khỏe!</div><div class="stars">✦ ✧</div>
+      <div class="room"><div class="pet"><i class="ear l"></i><i class="ear r"></i><i class="eye l"></i><i class="eye r"></i><i class="blush l"></i><i class="blush r"></i><i class="mouth"></i></div><div class="bed"><div class="pillow"></div><div class="blanket"></div></div></div>
+    </div>
+  </div>
+  <div class="cards">
+    <div class="card"><span class="pill">01</span><h3>Check-in 10 giây</h3><p class="muted">Ghi giờ lên giường và thức dậy, không cần thiết bị đặc biệt.</p></div>
+    <div class="card"><span class="pill">02</span><h3>Nuôi bằng hành vi</h3><p class="muted">Mỗi đêm ngủ đúng kế hoạch là một lần chăm Pet.</p></div>
+    <div class="card"><span class="pill">03</span><h3>Tiến hóa sau 21 ngày</h3><p class="muted">Chuỗi ngày tốt mở khóa skin, huy hiệu và thành tích.</p></div>
+  </div>
+</section>
+
+<section id="house" class="view">
+  <div class="section-head"><div><span class="eyebrow">🏠 NHÀ CỦA PET</span><h2>Chào buổi tối, Ngọc Anh!</h2><p class="muted">Pet của bạn đang chờ check-in.</p></div><span class="pill">🔥 Streak 3 ngày</span></div>
+  <div class="house">
+    <div class="panel pet-scene" style="height:480px"><div class="sleep-bubble" id="petMood">💚 Khỏe và vui</div><div class="stars">✦ ✧</div><div class="room"><div class="pet" id="housePet"><i class="ear l"></i><i class="ear r"></i><i class="eye l"></i><i class="eye r"></i><i class="blush l"></i><i class="blush r"></i><i class="mouth"></i></div><div class="bed"><div class="pillow"></div><div class="blanket"></div></div></div></div>
+    <div class="panel">
+      <div class="checkin"><div><div class="muted">Giờ ngủ mục tiêu</div><div class="big-time">22:30</div></div><div class="status" id="status">Chưa check-in</div></div>
+      <p class="muted">Hôm nay bạn đi ngủ lúc mấy giờ?</p>
+      <input id="sleepTime" type="time" value="22:25" style="font-size:22px;padding:12px;border:1px solid #DDD6EB;border-radius:14px;width:100%">
+      <button class="btn primary" style="width:100%;margin-top:12px" onclick="checkin()">🌙 Check-in ngủ</button>
+      <div style="margin-top:28px"><h3>7 ngày gần nhất</h3><div class="calendar">
+        <div class="day good">T2<br>✓</div><div class="day good">T3<br>✓</div><div class="day good">T4<br>✓</div><div class="day today">T5<br>•</div><div class="day">T6<br>—</div><div class="day">T7<br>—</div><div class="day">CN<br>—</div>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<section id="challenge" class="view">
+  <div class="section-head"><div><span class="eyebrow">🏆 THỬ THÁCH 21 NGÀY</span><h2>21 ngày để đổi một thói quen</h2><p class="muted">Tiến bộ, không hoàn hảo.</p></div><span class="pill">4 / 21 ngày</span></div>
+  <div class="cards" style="margin-bottom:22px">
+    <div class="card"><div class="muted">Chuỗi hiện tại</div><div class="stat">🔥 3</div></div>
+    <div class="card"><div class="muted">Giờ ngủ trung bình</div><div class="stat">22:48</div></div>
+    <div class="card"><div class="muted">Skin tiếp theo</div><div class="stat">🌟 7 ngày</div></div>
+  </div>
+  <div class="panel">
+    <h3>Tiến trình mở khóa skin</h3><div class="bar"><span></span></div><p class="muted">Còn 3 ngày nữa để mở khóa <b>Pet Ngôi Sao</b>.</p>
+    <div class="challenge-row"><span>🌙 Ngủ trước giờ mục tiêu</span><b>3/7</b></div>
+    <div class="challenge-row"><span>📵 Không doomscroll 30 phút trước ngủ</span><b>2/5</b></div>
+    <div class="challenge-row"><span>💧 Hoàn thành routine 3-2-1</span><b>1/3</b></div>
+  </div>
+  <div class="panel" style="margin-top:18px"><h3>🏅 BXH lớp — ẩn danh</h3><p class="muted">Điểm là điểm thói quen, không phải điểm “ngủ giỏi” tuyệt đối.</p>
+    <div class="challenge-row"><span>🥇 Pet Mặt Trăng</span><b>820 XP</b></div><div class="challenge-row"><span>🥈 Pet Sao Băng</span><b>770 XP</b></div><div class="challenge-row"><span>🥉 Pet Mây</span><b>720 XP</b></div><div class="challenge-row"><span>🌱 Bạn</span><b>610 XP</b></div>
+  </div>
+</section>
+
+<section id="treasure" class="view">
+  <div class="section-head"><div><span class="eyebrow">🎁 KHO BÁU 3-2-1</span><h2>5 bí kíp để Pet được ngủ ngon</h2><p class="muted">Bấm vào từng thẻ để lật xem giải pháp. Mỗi nhiệm vụ hoàn thành +20 XP.</p></div></div>
+  <div class="flip-grid">
+    <div class="flip" onclick="this.classList.toggle('open')"><div class="flip-inner"><div class="face"><div class="icon">📵</div><h3>1. Tắt cuộn</h3><p class="muted">Đặt điện thoại xa giường.</p></div><div class="face back"><h3>Thử ngay</h3><p>Hẹn giờ 30 phút trước ngủ. Khi chuông reo, chuyển điện thoại sang chế độ ngủ.</p><button class="btn primary" onclick="event.stopPropagation();reward(this)">+20 XP</button></div></div></div>
+    <div class="flip" onclick="this.classList.toggle('open')"><div class="flip-inner"><div class="face"><div class="icon">🕯️</div><h3>2. Hạ nhịp</h3><p class="muted">Routine ngắn, lặp lại mỗi tối.</p></div><div class="face back"><h3>Thử ngay</h3><p>3 bước: vệ sinh cá nhân → chuẩn bị đồ sáng mai → lên giường.</p><button class="btn primary" onclick="event.stopPropagation();reward(this)">+20 XP</button></div></div></div>
+    <div class="flip" onclick="this.classList.toggle('open')"><div class="flip-inner"><div class="face"><div class="icon">⏰</div><h3>3. Giờ neo</h3><p class="muted">Giữ giờ thức dậy ổn định.</p></div><div class="face back"><h3>Thử ngay</h3><p>Chọn một khung thức dậy phù hợp với lịch học và cố gắng giữ ổn định.</p><button class="btn primary" onclick="event.stopPropagation();reward(this)">+20 XP</button></div></div></div>
+    <div class="flip" onclick="this.classList.toggle('open')"><div class="flip-inner"><div class="face"><div class="icon">📝</div><h3>4. Xả não</h3><p class="muted">Đừng mang deadline lên giường.</p></div><div class="face back"><h3>Thử ngay</h3><p>Viết 3 việc cần làm ngày mai ra giấy, rồi đóng sổ.</p><button class="btn primary" onclick="event.stopPropagation();reward(this)">+20 XP</button></div></div></div>
+    <div class="flip" onclick="this.classList.toggle('open')"><div class="flip-inner"><div class="face"><div class="icon">💡</div><h3>5. Ánh sáng</h3><p class="muted">Sáng rõ, tối dịu.</p></div><div class="face back"><h3>Thử ngay</h3><p>Buổi sáng tìm ánh sáng tự nhiên; trước ngủ giảm ánh sáng mạnh.</p><button class="btn primary" onclick="event.stopPropagation();reward(this)">+20 XP</button></div></div></div>
+  </div>
+</section>
+
+<section id="community" class="view">
+  <div class="section-head"><div><span class="eyebrow">💬 CỘNG ĐỒNG</span><h2>Bí kíp của tao</h2><p class="muted">Chia sẻ ẩn danh, không cần khoe thành tích.</p></div><button class="btn primary" onclick="post()">+ Đăng bí kíp</button></div>
+  <div class="community">
+    <div class="panel" id="feed">
+      <div class="post"><div class="post-avatar">🐰</div><div><b>Pet Mây</b><p>“Tớ để sạc điện thoại xa giường nên đỡ cầm lên lướt hơn hẳn.”</p><button class="like" onclick="like(this)">♡ 18</button></div></div>
+      <div class="post"><div class="post-avatar">🐼</div><div><b>Pet Trà Sữa</b><p>“Viết việc ngày mai ra giấy trước khi ngủ giúp đầu óc nhẹ hơn.”</p><button class="like" onclick="like(this)">♡ 12</button></div></div>
+      <div class="post"><div class="post-avatar">🦊</div><div><b>Pet Sao</b><p>“Bật nhạc nhẹ + tắt đèn lớn là tín hiệu cho não biết đã đến giờ ngủ.”</p><button class="like" onclick="like(this)">♡ 27</button></div></div>
+    </div>
+    <div class="panel"><h3>🌟 Pet nổi bật</h3><div class="challenge-row"><span>Pet Mây</span><b>12 ngày</b></div><div class="challenge-row"><span>Pet Sao</span><b>9 ngày</b></div><div class="challenge-row"><span>Pet Trà Sữa</span><b>8 ngày</b></div><p class="muted" style="margin-top:20px;font-size:13px">Tên hiển thị là biệt danh Pet. Không công khai tên thật.</p></div>
+  </div>
+</section>
+</main>
+
+<div class="modal" id="modal"><div class="modal-box"><button class="close" onclick="closeModal()">×</button><span class="eyebrow">🧠 TEST RBP — 1 PHÚT</span><h2>Đo mức độ trì hoãn giấc ngủ</h2><p class="muted">Trong 7 ngày gần đây, hãy tự chấm nhanh:</p>
+<label><input type="checkbox"> Tớ thường thức khuya dù không có lý do bắt buộc.</label><br><br>
+<label><input type="checkbox"> Tớ trì hoãn việc đi ngủ để có “thời gian cho riêng mình”.</label><br><br>
+<label><input type="checkbox"> Tớ thường lướt điện thoại lâu hơn dự định trước khi ngủ.</label><br><br>
+<label><input type="checkbox"> Tớ biết mình nên ngủ nhưng vẫn tiếp tục hoạt động.</label>
+<button class="btn primary" style="width:100%;margin-top:22px" onclick="finishTest()">Xem kết quả →</button>
+</div></div>
+
+<script>
+const views=[...document.querySelectorAll('.view')];
+function go(id){views.forEach(v=>v.classList.toggle('active',v.id===id));document.querySelectorAll('.navlinks button').forEach(b=>b.classList.toggle('active',b.dataset.view===id));window.scrollTo({top:0,behavior:'smooth'})}
+document.querySelectorAll('.navlinks button').forEach(b=>b.onclick=()=>go(b.dataset.view));
+function startTest(){document.getElementById('modal').classList.add('show')}
+function closeModal(){document.getElementById('modal').classList.remove('show')}
+function finishTest(){closeModal();go('house');setTimeout(()=>alert('🌱 Kết quả mô phỏng: Bạn có một vài dấu hiệu trì hoãn giấc ngủ. Không sao — hãy bắt đầu bằng 1 thay đổi nhỏ tối nay!'),100)}
+function checkin(){const t=document.getElementById('sleepTime').value;document.getElementById('status').textContent='Đã check-in ✓';document.getElementById('status').style.background='#DDF7E7';document.getElementById('status').style.color='#187A46';document.getElementById('petMood').textContent='💚 Pet được chăm rồi!';alert('✨ +50 XP! Pet khỏe hơn vì bạn đã check-in lúc '+t+'.')}
+function reward(btn){btn.textContent='✓ Đã nhận';btn.disabled=true;btn.style.opacity='.6';alert('🎉 +20 XP! Bí kíp đã được lưu.')}
+function like(btn){let n=parseInt(btn.textContent.match(/\d+/)[0])+1;btn.textContent='♥ '+n}
+function post(){const text=prompt('Viết một bí kíp ngắn cho cộng đồng:');if(!text)return;const p=document.createElement('div');p.className='post';p.innerHTML='<div class="post-avatar">🌱</div><div><b>Pet Ẩn Danh</b><p>'+text.replace(/[<>]/g,'')+'</p><button class="like" onclick="like(this)">♡ 0</button></div>';document.getElementById('feed').prepend(p)}
+</script>
+</div>
+</body>
+</html>'''
+path="/mnt/data/rem_pet_preview.html"
+Path(path).write_text(html, encoding="utf-8")
+print(path, Path(path).stat().st_size)
